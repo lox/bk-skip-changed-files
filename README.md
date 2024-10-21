@@ -4,10 +4,14 @@ A common need in a Buildkite pipeline is to skip steps in a pipeline.yml if spec
 
 This implements a library and a command line tool to help with this by preprocessing the pipeline.yml file and adding support for a `skip_if_unchanged` property that takes a list of zglobs.
 
+## Example
+
+See the [examples/pipeline.yml](examples/pipeline.yml) file for an example of how to use the `skip_if_unchanged` property.
+
 ## Usage
 
 ```
-bk-skip-unchanged-files pipeline.yml --upload # uploads the modified pipeline.yml to Buildkite
+bk-skip-unchanged-files pipeline.yml --upload
 ```
 
 ## How diffs are detected
