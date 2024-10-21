@@ -1,0 +1,53 @@
+cache:
+  paths:
+    - "/root/go/pkg/mod"
+    - "/root/.cache/"
+    - "/root/.terraform.d/plugin-cache"
+  size: "20g"
+
+# comments are preserved
+common_plugins:
+  hermit: &hermit elastic/hermit#v1.0.0
+  gcp: &gcp_auth
+    gcp-workload-identity-federation#v1.4.0:
+      audience: $GCP_CLOUD_AUDIENCE
+      service-account: $GCP_CLOUD_SERVICE_ACCOUNT
+  gcr: &gcr_auth
+    planetscale/docker-login-gcr#v0.0.1:
+      registries: ["us-docker.pkg.dev"]
+
+steps:
+  - label: "Only run on change"
+    command: "build.sh"
+    skip_if_unchanged:
+      - "**/*.go"
+    plugins:
+      - *hermit
+      - *gcp_auth
+
+  - group: "🔧 Build and Test"
+    key: "build-and-test"
+    steps:
+      - label: ":hammer: Build"
+        command: "build.sh"
+        skip_if_unchanged:
+          - "**/*.go"
+        plugins:
+          - *hermit
+          - *gcp_auth
+
+      - label: ":test_tube: Unit Tests"
+        command: "run_unit_tests.sh"
+        skip_if_unchanged:
+          - "**/*.go"
+        plugins:
+          - *hermit
+          - *gcp_auth
+
+      - label: ":microscope: Integration Tests"
+        command: "run_integration_tests.sh"
+        skip_if_unchanged:
+          - "**/*.go"
+        plugins:
+          - *hermit
+          - *gcp_auth
